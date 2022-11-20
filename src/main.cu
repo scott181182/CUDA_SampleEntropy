@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "cuda.h"
+#include "./book.h"
 
 
 
