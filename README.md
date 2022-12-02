@@ -19,3 +19,10 @@ The `data` directory holds reference data:
 ### `ref`
 
 The `ref` directory contains some reference materials/programs in order to verify the CUDA implementation
+
+## Results
+
+Reference R implementation (using a C binding) takes an average of 0.222 seconds on the datasets in this projects.
+My naive C implementation takes about 0.50 seconds,
+My naive CUDA C++ implementation (using one thread per output template window) takes 0.145 seconds.
+
