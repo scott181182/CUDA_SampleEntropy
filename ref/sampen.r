@@ -1,6 +1,6 @@
 library(TSEntropies)
 
-data <- read.csv("data/rand.csv", header = FALSE)
+data <- read.csv("data/sine.csv", header = FALSE)
 
 r <- 0.15 * sd(data$V1)
 print(r)
