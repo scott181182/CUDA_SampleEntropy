@@ -3,7 +3,7 @@
 
 build: target/sampen
 
-target/%: src/*.cu
+target/%: src/%.cu
 	nvcc --output-file $@ $<
 
 run: target/sampen
