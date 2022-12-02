@@ -52,8 +52,8 @@ double sampen(double* data, unsigned int length, unsigned int m, double r) {
         }
     }
 
-    // printf("A=%ld, B=%ld\n", A, B);
-    // printf("A/B=%16.16lf\n", (double)A / (double)B);
+    printf("A=%ld, B=%ld\n", A, B);
+    printf("A/B=%16.16lf\n", (double)A / (double)B);
     return -log((double)A / (double)B);
 }
 
