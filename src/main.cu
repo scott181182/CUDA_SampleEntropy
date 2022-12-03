@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cuda.h"
-#include "./book.h"
-
 #include "./load.cu"
 #include "./utils.cu"
 #include "./sampen_cpu.cu"

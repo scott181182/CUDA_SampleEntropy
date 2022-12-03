@@ -1,7 +1,5 @@
 #include <stdlib.h>
 
-#include "cuda.h"
-#include "./book.h"
 #include "./sampen_cpu.h"
 
 
