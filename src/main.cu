@@ -13,6 +13,48 @@
 
 
 
+void run_benchmark(uint32_t n) {
+    // printf("Reading multi-series data...");
+    float data1[DATA_SIZE];
+    float data2[DATA_SIZE];
+    float data3[DATA_SIZE];
+    load_series_data("data/sine.csv", data1);
+    load_series_data("data/rand.csv", data2);
+    load_series_data("data/real.csv", data3);
+    // printf("done!\n");
+
+    float r = 0.15 * standard_deviation(data1, DATA_SIZE);
+    // printf("r=%16.16lf\n", r);
+
+    uint32_t *lengths = (uint32_t*)malloc(sizeof(uint32_t) * n);
+    float **data_multi = (float**)malloc(sizeof(float*) * n + sizeof(float) * n * DATA_SIZE);
+    if(data_multi == NULL) {
+        printf("Unable to allocate data matrix.\n");
+        return;
+    }
+    for(uint32_t i = 0; i < n; i++) {
+        lengths[i] = DATA_SIZE;
+        data_multi[i] = ((float*)(data_multi + n) + i * DATA_SIZE);
+
+        float* data = (i % 3) == 0 ? data1 : (i % 3) == 1 ? data2 : data3;
+        memcpy(data_multi[i], data, DATA_SIZE * sizeof(float));
+        // printf("    [%d] %f ... %f\n", i, data_multi[i][0], data_multi[i][DATA_SIZE - 1]);
+    }
+    float* results = (float*)malloc(sizeof(float) * n);
+
+    printf("Performing MULTI(n=%d) SampEn calculation on GPU...\n\n", n);
+    clock_t t = clock();
+    sampen_gpu_multi(data_multi, lengths, n, 2, r, results);
+    t = clock() - t;
+    float elapsed = ((float)t)/CLOCKS_PER_SEC;
+    printf("Elapsed Time = %8.6lfs\n", elapsed);
+    for(uint32_t i = 0; i < n; i++) {
+        // printf("    sampen[%d] = %8.8f\n", i, results[i]);
+    }
+
+    free(data_multi);
+    free(results);
+}
 int main(int argc, char const *argv[])
 {
     if(argc < 2) {
@@ -24,10 +66,16 @@ int main(int argc, char const *argv[])
         return 1;
     }
 
-    float data[DATA_SIZE];
 
     const char* filename = argv[1];
+    if(strncmp(argv[1], "benchmark", 9) == 0) {
+        uint32_t n = strtoul(argv[2], NULL, 10);
+        run_benchmark(n);
+        return 0;
+    }
+
     printf("Reading data from '%s'...", filename);
+    float data[DATA_SIZE];
     load_series_data(filename, data);
     printf("done!\n");
 
@@ -54,6 +102,39 @@ int main(int argc, char const *argv[])
         float elapsed = ((float)t)/CLOCKS_PER_SEC;
         printf("Sample Entropy = %16.16lf\n", result);
         printf("Elapsed Time = %8.6lfs", elapsed);
+    } else if(strncmp(argv[2], "mul", 3) == 0) {
+        if(argc < 4) {
+            printf("Expected parameter 'n' to mul as third parameter\n");
+            return 1;
+        }
+
+        uint32_t n = strtoul(argv[3], NULL, 10);
+        uint32_t *lengths = (uint32_t*)malloc(sizeof(uint32_t) * n);
+        float **data_multi = (float**)malloc(sizeof(float*) * n + sizeof(float) * n * DATA_SIZE);
+        if(data_multi == NULL) {
+            printf("Unable to allocate data matrix.\n");
+            return 2;
+        }
+        for(uint32_t i = 0; i < n; i++) {
+            lengths[i] = DATA_SIZE;
+            data_multi[i] = ((float*)(data_multi + n) + i * DATA_SIZE);
+            memcpy(data_multi[i], data, DATA_SIZE * sizeof(float));
+            // printf("    [%d] %f ... %f\n", i, data_multi[i][0], data_multi[i][DATA_SIZE - 1]);
+        }
+        float* results = (float*)malloc(sizeof(float) * n);
+
+        printf("Performing MULTI(n=%d) SampEn calculation on GPU...\n\n", n);
+        clock_t t = clock();
+        sampen_gpu_multi(data_multi, lengths, n, 2, r, results);
+        t = clock() - t;
+        float elapsed = ((float)t)/CLOCKS_PER_SEC;
+        printf("Elapsed Time = %8.6lfs\n", elapsed);
+        for(uint32_t i = 0; i < n; i++) {
+            printf("    sampen[%d] = %8.8f\n", i, results[i]);
+        }
+
+        free(data_multi);
+        free(results);
     } else {
         printf("Unknown processing mode '%s', expected 'cpu' or 'gpu'\n", argv[2]);
         return 1;

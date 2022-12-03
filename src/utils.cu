@@ -18,3 +18,11 @@ float standard_deviation(float* data, unsigned int length) {
     }
     return sqrt(sigma / (length - 1));
 }
+
+unsigned int reduce_max(unsigned int *lengths, unsigned int n) {
+    unsigned int res = lengths[0];
+    for(unsigned int i = 1; i < n; i++) {
+        if(lengths[i] > res) { res = lengths[i]; }
+    }
+    return res;
+}
