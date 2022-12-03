@@ -24,7 +24,7 @@ int main(int argc, char const *argv[])
         return 1;
     }
 
-    double data[DATA_SIZE];
+    float data[DATA_SIZE];
 
     const char* filename = argv[1];
     printf("Reading data from '%s'...", filename);
@@ -35,23 +35,23 @@ int main(int argc, char const *argv[])
     // printf("...\n");
     // printf("%24.24lf\n", data[DATA_SIZE - 1]);
 
-    double r = 0.15 * standard_deviation(data, DATA_SIZE);
+    float r = 0.15 * standard_deviation(data, DATA_SIZE);
     printf("r=%16.16lf\n", r);
 
     if(strncmp(argv[2], "cpu", 3) == 0) {
         printf("Performing SampEn calculation on CPU...\n\n");
         clock_t t = clock();
-        double result = sampen_cpu(data, DATA_SIZE, 2, r);
+        float result = sampen_cpu(data, DATA_SIZE, 2, r);
         t = clock() - t;
-        double elapsed = ((double)t)/CLOCKS_PER_SEC;
+        float elapsed = ((float)t)/CLOCKS_PER_SEC;
         printf("Sample Entropy = %16.16lf\n", result);
         printf("Elapsed Time = %8.6lfs", elapsed);
     } else if(strncmp(argv[2], "gpu", 3) == 0) {
         printf("Performing SampEn calculation on GPU...\n\n");
         clock_t t = clock();
-        double result = sampen_gpu(data, DATA_SIZE, 2, r);
+        float result = sampen_gpu(data, DATA_SIZE, 2, r);
         t = clock() - t;
-        double elapsed = ((double)t)/CLOCKS_PER_SEC;
+        float elapsed = ((float)t)/CLOCKS_PER_SEC;
         printf("Sample Entropy = %16.16lf\n", result);
         printf("Elapsed Time = %8.6lfs", elapsed);
     } else {

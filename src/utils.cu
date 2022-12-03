@@ -1,19 +1,17 @@
 #include <math.h>
 
-#include "./utils.h"
 
 
-
-double mean(double* data, unsigned int length) {
-    double mu = 0;
+float mean(float* data, unsigned int length) {
+    float mu = 0;
     for(int i = 0; i < length; i++) {
         mu += data[i] / length;
     }
     return mu;
 }
-double standard_deviation(double* data, unsigned int length) {
-    double mu = mean(data, length);
-    double sigma = 0, v;
+float standard_deviation(float* data, unsigned int length) {
+    float mu = mean(data, length);
+    float sigma = 0, v;
     for(int i = 0; i < length; i++) {
         v = data[i] - mu;
         sigma += v * v;

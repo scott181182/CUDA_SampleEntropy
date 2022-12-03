@@ -3,7 +3,6 @@
 
 #include "cuda.h"
 #include "./book.h"
-#include "./sampen_gpu.h"
 
 
 
@@ -11,15 +10,15 @@
 
 
 
-__device__ double chebyshev_distance_gpu(double* A, double* B, unsigned int length) {
-    double d = 0;
+__device__ float chebyshev_distance_gpu(float* A, float* B, unsigned int length) {
+    float d = 0;
     for(unsigned int i = 0; i < length; i++) {
         d = max(abs(A[i] - B[i]), d);
     }
     return d;
 }
 
-__global__ void sampen_kernel(double* data, unsigned int length, unsigned int m, double r, unsigned int *AB) {
+__global__ void sampen_kernel(float* data, unsigned int length, unsigned int m, float r, unsigned int *AB) {
     int i = threadIdx.x + blockDim.x * blockIdx.x;
 
     if(i > length - m) { return; }
@@ -45,12 +44,12 @@ __global__ void sampen_kernel(double* data, unsigned int length, unsigned int m,
         AB[2 * i + 1] = B;
     }
 }
-double sampen_gpu(double* data, unsigned int length, unsigned int m, double r) {
+float sampen_gpu(float* data, unsigned int length, unsigned int m, float r) {
     if(m < 1) { return 0; }
 
-    double *data_dev;
-    HANDLE_ERROR(cudaMalloc((void**)&data_dev, sizeof(double) * length));
-    HANDLE_ERROR(cudaMemcpy(data_dev, data, sizeof(double) * length, cudaMemcpyHostToDevice));
+    float *data_dev;
+    HANDLE_ERROR(cudaMalloc((void**)&data_dev, sizeof(float) * length));
+    HANDLE_ERROR(cudaMemcpy(data_dev, data, sizeof(float) * length, cudaMemcpyHostToDevice));
 
     /** Interleaved array of window-wise {A, B} pairings. */
     unsigned int AB_length = 2 * (length - m + 1);
@@ -74,6 +73,6 @@ double sampen_gpu(double* data, unsigned int length, unsigned int m, double r) {
     free(AB_arr);
 
     printf("A=%ld, B=%ld\n", A, B);
-    printf("A/B=%16.16lf\n", (double)A / (double)B);
-    return -log((double)A / (double)B);
+    printf("A/B=%16.16lf\n", (float)A / (float)B);
+    return -log((float)A / (float)B);
 }
