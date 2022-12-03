@@ -10,7 +10,6 @@
 
 #define DATA_SIZE  6502
 #define KERNEL_SIZE 1024
-#define BLOCK_SIZE (DATA_SIZE / KERNEL_SIZE + 1)
 
 
 
@@ -78,6 +77,7 @@ double sampen(double* data, unsigned int length, unsigned int m, double r) {
     unsigned int *AB_dev;
     HANDLE_ERROR(cudaMalloc((void**)&AB_dev, AB_pitch));
 
+    const unsigned int BLOCK_SIZE = (length / KERNEL_SIZE) + 1;
     sampen_kernel<<<KERNEL_SIZE, BLOCK_SIZE>>>(data_dev, length, m, r, AB_dev);
 
     cudaFree(data_dev);
